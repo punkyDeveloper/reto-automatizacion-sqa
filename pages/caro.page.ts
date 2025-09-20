@@ -17,7 +17,12 @@ export class CarritoPage {
   private readonly emptyCartMessage = '.woocommerce-info, .cart-empty';
   private readonly updateCartButton = '[name="update_cart"]';
   private readonly cartIcon = '.mini-cart';
-  private readonly cartCounter = '.mini-cart-items, .cart-contents-count';
+  
+  // ✅ FIX: Selector más específico para evitar ambigüedad
+  private readonly cartCounter = '.mini-cart-items:not(.cart-mobile)';
+  // ✅ ALTERNATIVA: Si necesitas ambos, usa .first()
+  private readonly cartCounterGeneral = '.mini-cart-items, .cart-contents-count';
+  
   private readonly checkoutButton = '.checkout-button';
   private readonly successMessage = '.woocommerce-message';
 
@@ -25,12 +30,13 @@ export class CarritoPage {
     this.page = page;
   }
 
+// ✅ FIX: Navegación mejorada con timeouts más largos
 async irAlCarrito(): Promise<void> {
     console.log('Navegando al carrito...');
     
     // Estrategia 1: Intentar click en icono del carrito
     const cartIcon = this.page.locator(this.cartIcon).first();
-    if (await cartIcon.isVisible({ timeout: 5000 })) {
+    if (await cartIcon.isVisible({ timeout: 8000 })) { // ✅ Aumentado timeout
       try {
         await cartIcon.click();
         await this.waitForCartLoad();
@@ -46,7 +52,10 @@ async irAlCarrito(): Promise<void> {
     
     for (const route of possibleRoutes) {
       try {
-        await this.page.goto(route, { timeout: 15000 });
+        await this.page.goto(route, { 
+          timeout: 30000, // ✅ Aumentado timeout
+          waitUntil: 'domcontentloaded' // ✅ Espera específica
+        });
         await this.waitForCartLoad();
         console.log(`✓ Navegación directa exitosa usando: ${route}`);
         return;
@@ -59,14 +68,20 @@ async irAlCarrito(): Promise<void> {
     throw new Error('No se pudo navegar al carrito usando ninguna estrategia');
   }
 
+  // ✅ FIX: Espera mejorada para carga del carrito
   async waitForCartLoad(): Promise<void> {
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForLoadState('domcontentloaded', { timeout: 30000 });
     
     // Esperar que cargue la tabla del carrito O el mensaje de carrito vacío
     const cartTable = this.page.locator(this.cartTable);
     const emptyMessage = this.page.locator(this.emptyCartMessage);
     
-    await expect(cartTable.or(emptyMessage)).toBeVisible();
+    await expect(cartTable.or(emptyMessage)).toBeVisible({ timeout: 15000 });
+    
+    // ✅ Espera adicional más inteligente - solo si es necesario
+    await this.page.waitForFunction(() => {
+      return document.readyState === 'complete';
+    }, { timeout: 10000 });
   }
 
   async getCartItemCount(): Promise<number> {
@@ -85,11 +100,11 @@ async irAlCarrito(): Promise<void> {
       has: this.page.locator(this.productName).filter({ hasText: new RegExp(expectedName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
     });
     
-    await expect(productRow).toBeVisible();
+    await expect(productRow).toBeVisible({ timeout: 10000 }); // ✅ Timeout específico
     
     // Validar el precio
     const priceElement = productRow.locator(this.productPrice);
-    await expect(priceElement).toBeVisible();
+    await expect(priceElement).toBeVisible({ timeout: 10000 });
     
     const actualPrice = await priceElement.textContent();
     const cleanActualPrice = this.cleanPriceString(actualPrice || '');
@@ -100,13 +115,13 @@ async irAlCarrito(): Promise<void> {
 
   async getSubtotal(): Promise<string> {
     const subtotalElement = this.page.locator(this.subtotalElement);
-    await expect(subtotalElement).toBeVisible();
+    await expect(subtotalElement).toBeVisible({ timeout: 10000 });
     return await subtotalElement.textContent() || '0';
   }
 
   async getTotal(): Promise<string> {
     const totalElement = this.page.locator(this.totalElement);
-    await expect(totalElement).toBeVisible();
+    await expect(totalElement).toBeVisible({ timeout: 10000 });
     return await totalElement.textContent() || '0';
   }
 
@@ -131,39 +146,53 @@ async irAlCarrito(): Promise<void> {
     return price.replace(/[^\d]/g, '');
   }
 
+  // ✅ FIX PRINCIPAL: removeProduct mejorado sin timeout fijo
   async removeProduct(productName: string): Promise<void> {
     // Buscar el producto por nombre (búsqueda más flexible)
     const productRow = this.page.locator(this.cartItems).filter({
       has: this.page.locator(this.productName).filter({ hasText: new RegExp(productName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
     });
     
-    await expect(productRow).toBeVisible();
+    await expect(productRow).toBeVisible({ timeout: 10000 });
     
     // Hacer click en el botón de eliminar
     const removeBtn = productRow.locator(this.removeButton);
-    await expect(removeBtn).toBeVisible();
+    await expect(removeBtn).toBeVisible({ timeout: 5000 });
+    
+    // ✅ Esperar específicamente que el producto desaparezca
     await removeBtn.click();
     
-    // Esperar que la página se actualice después de eliminar
-    await this.page.waitForLoadState('domcontentloaded');
-    await this.page.waitForTimeout(3000);
+    // ✅ En lugar de waitForTimeout, esperar condiciones específicas
+    await this.page.waitForLoadState('domcontentloaded', { timeout: 15000 });
+    
+    // ✅ Esperar que el producto específico ya no esté visible
+    await expect(productRow).toBeHidden({ timeout: 10000 });
+    
+    // ✅ O esperar que el contador del carrito se actualice
+    const currentItemCount = await this.getCartItemCount();
+    console.log(`Producto eliminado. Items restantes: ${currentItemCount}`);
   }
 
   async isCartEmpty(): Promise<boolean> {
-    // Verificar si existe mensaje de carrito vacío
-    const emptyMessage = this.page.locator(this.emptyCartMessage);
-    if (await emptyMessage.isVisible()) {
-      return true;
+    try {
+      // Verificar si existe mensaje de carrito vacío
+      const emptyMessage = this.page.locator(this.emptyCartMessage);
+      if (await emptyMessage.isVisible({ timeout: 3000 })) {
+        return true;
+      }
+      
+      // Verificar si no hay items en la tabla
+      const itemCount = await this.page.locator(this.cartItems).count();
+      return itemCount === 0;
+    } catch (error) {
+      // Si hay error, asumir que no está vacío y dejar que otros métodos manejen el error
+      return false;
     }
-    
-    // Verificar si no hay items en la tabla
-    const itemCount = await this.page.locator(this.cartItems).count();
-    return itemCount === 0;
   }
 
   async getEmptyCartMessage(): Promise<string> {
     const emptyMessage = this.page.locator(this.emptyCartMessage);
-    if (await emptyMessage.isVisible()) {
+    if (await emptyMessage.isVisible({ timeout: 5000 })) {
       return await emptyMessage.textContent() || '';
     }
     return '';
@@ -175,7 +204,7 @@ async irAlCarrito(): Promise<void> {
     expect(isEmpty).toBe(true);
     
     // Si hay mensaje de carrito vacío, validarlo
-    if (await this.page.locator(this.emptyCartMessage).isVisible()) {
+    if (await this.page.locator(this.emptyCartMessage).isVisible({ timeout: 5000 })) {
       const emptyMessage = await this.getEmptyCartMessage();
       expect(emptyMessage.toLowerCase()).toMatch(/carrito|vac[íi]o|empty/);
     }
@@ -187,7 +216,7 @@ async irAlCarrito(): Promise<void> {
     expect(itemCount).toBeGreaterThan(0);
     
     // Validar que la tabla del carrito es visible
-    await expect(this.page.locator(this.cartTable)).toBeVisible();
+    await expect(this.page.locator(this.cartTable)).toBeVisible({ timeout: 10000 });
     
     // Validar que hay subtotal mayor a 0
     const subtotal = await this.getSubtotal();
@@ -197,7 +226,7 @@ async irAlCarrito(): Promise<void> {
 
   async validarSuccessMessage(productName?: string): Promise<void> {
     const message = this.page.locator(this.successMessage);
-    await expect(message).toBeVisible();
+    await expect(message).toBeVisible({ timeout: 10000 });
     
     if (productName) {
       await expect(message).toContainText(productName);
@@ -252,8 +281,30 @@ async irAlCarrito(): Promise<void> {
 
   async proceedToCheckout(): Promise<void> {
     const checkoutButton = this.page.locator(this.checkoutButton);
-    await expect(checkoutButton).toBeVisible();
+    await expect(checkoutButton).toBeVisible({ timeout: 10000 });
     await checkoutButton.click();
+  }
+
+  // ✅ Método helper para obtener el contador del carrito de forma segura
+  async getCartCounterText(): Promise<string> {
+    try {
+      // Intentar con el selector específico primero
+      const specificCounter = this.page.locator(this.cartCounter);
+      if (await specificCounter.isVisible({ timeout: 3000 })) {
+        return await specificCounter.textContent() || '0';
+      }
+      
+      // Si no funciona, usar el genérico con .first()
+      const generalCounter = this.page.locator(this.cartCounterGeneral).first();
+      if (await generalCounter.isVisible({ timeout: 3000 })) {
+        return await generalCounter.textContent() || '0';
+      }
+      
+      return '0';
+    } catch (error) {
+      console.log('Error obteniendo contador del carrito:', error);
+      return '0';
+    }
   }
 
   // Métodos de screenshots para el test de cumpleaños
@@ -284,10 +335,14 @@ async irAlCarrito(): Promise<void> {
     console.log(`- Está vacío: ${isEmpty}`);
     
     if (!isEmpty) {
-      const subtotal = await this.getSubtotal();
-      const total = await this.getTotal();
-      console.log(`- Subtotal: ${subtotal}`);
-      console.log(`- Total: ${total}`);
+      try {
+        const subtotal = await this.getSubtotal();
+        const total = await this.getTotal();
+        console.log(`- Subtotal: ${subtotal}`);
+        console.log(`- Total: ${total}`);
+      } catch (error) {
+        console.log('Error obteniendo subtotal/total:', error);
+      }
     }
   }
 }

@@ -1,0 +1,169 @@
+# 🎭 Proyecto de Automatización con Playwright
+
+<div align="center">
+
+![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Test exitoso](<img src="./test/fixtures/imgtest/exit.png" alt="Test exitoso" width="500" >)
+
+**Un proyecto de testing automatizado usando Playwright para pruebas end-to-end**
+
+</div>
+
+## 📋 Tabla de Contenidos
+
+- [🎯 Descripción](#-descripción)
+- [📋 Prerrequisitos](#-prerrequisitos)
+- [🚀 Instalación](#-instalación)
+- [⚡ Ejecución](#-ejecución)
+- [📊 Scripts Disponibles](#-scripts-disponibles)
+- [📁 Estructura del Proyecto](#-estructura-del-proyecto)
+- [🤝 Contribuir](#-contribuir)
+
+## 🎯 Descripción
+
+Este proyecto utiliza **Playwright** para realizar pruebas automatizadas end-to-end. Playwright es una biblioteca de automatización que permite probar aplicaciones web modernas en múltiples navegadores (Chromium, Firefox, Safari).
+
+### ✨ Características principales:
+- 🌐 Soporte para múltiples navegadores
+- 📱 Pruebas en dispositivos móviles
+- 🎥 Grabación de videos y capturas de pantalla
+- 🔄 Ejecución paralela de pruebas
+- 📈 Reportes detallados
+
+## 📋 Prerrequisitos
+
+Antes de comenzar, asegúrate de tener instalado:
+
+- **Node.js** (versión 18 o superior)
+- **npm**
+- **Git**
+
+### Verificar instalación:
+```bash
+node --version
+npm --version
+git --version
+```
+
+## 🚀 Instalación
+
+### 1. 📥 Clonar el repositorio
+
+```bash
+# Clona el repositorio
+git clone https://github.com/punkyDeveloper/reto-automatizacion-sqa.git
+
+# Navega al directorio del proyecto
+cd reto-automatizacion-sqa
+```
+
+### 2. 📦 Instalar dependencias
+
+```bash
+# Instala las dependencias del proyecto
+npm install
+
+```
+
+### 3. 🌐 Instalar navegadores de Playwright
+
+```bash
+# Instala los navegadores necesarios para Playwright
+npx playwright install
+
+# Si solo necesitas navegadores específicos:
+npx playwright install chromium firefox webkit
+```
+
+> **💡 Tip:** La primera instalación puede tardar varios minutos ya que descarga los navegadores necesarios.
+
+## ⚡ Ejecución
+
+Una vez completada la instalación, puedes ejecutar las pruebas usando los siguientes comandos:
+
+### 🧪 Ejecutar todas las pruebas
+```bash
+npm run test
+```
+
+### 👀 Ejecutar pruebas con interfaz visual (headed)
+```bash
+npm run test:headed
+```
+
+### 📊 Ver reporte de pruebas
+```bash
+npm run report
+```
+
+## 📊 Scripts Disponibles
+
+| Script | Comando | Descripción |
+|--------|---------|-------------|
+| **test** | `npm run test` | Ejecuta todas las pruebas en modo headless |
+| **test:headed** | `npm run test:headed` | Ejecuta las pruebas con navegador visible |
+| **report** | `npm run report` | Abre el reporte HTML de las pruebas |
+
+### 🔧 Comandos adicionales útiles
+
+```bash
+# Ejecutar pruebas en un navegador específico
+npx playwright test --project=chromium
+
+# Ejecutar una prueba específica
+npx playwright test tests/mi-prueba.spec.js
+
+# Ejecutar pruebas en modo debug
+npx playwright test --debug
+
+# Generar código de prueba automáticamente
+npx playwright codegen https://ejemplo.com
+```
+
+## 📁 Estructura del Proyecto
+
+```
+├── 📁 tests/                 # Archivos de prueba
+│   ├── 📄 example.spec.js    # Pruebas de ejemplo
+│   └── 📄 ...               # Más pruebas
+├── 📁 test-results/          # Resultados de pruebas
+├── 📁 playwright-report/     # Reportes HTML
+├── 📄 playwright.config.js   # Configuración de Playwright
+├── 📄 package.json          # Dependencias y scripts
+└── 📄 README.md             # Este archivo
+```
+
+## 🔧 Configuración
+
+El archivo `playwright.config.js` contiene la configuración principal:
+
+- **Navegadores:** Chromium, Firefox, Safari
+- **Modo:** Headless por defecto
+- **Reportes:** HTML y terminal
+- **Capturas:** En caso de fallos
+- **Videos:** Para pruebas fallidas
+
+## 📈 Interpretando los Resultados
+
+### ✅ Prueba exitosa
+- ✓ Indica que la prueba pasó correctamente
+
+### ❌ Prueba fallida  
+- ✗ Indica que la prueba falló
+- Revisa los logs y capturas en `test-results/`
+
+### 📊 Reporte HTML
+- Accede con `npm run report`
+- Vista detallada con timeline y capturas
+- Filtros por estado y navegador
+
+
+---
+
+<div align="center">
+
+**¡Feliz Test! 🚀**
+
+</div>
