@@ -5,10 +5,10 @@ export class HomePage {
 
   // Selectores más específicos basados en el HTML real
   private readonly menuNavigation = 'ul#primary-menu';
-  // Usar selectores específicos del menú desktop (más estable)
+  // Usar selectores específicos 
   private readonly amorLinkDesktop = '#primary-menu a[href="https://www.floristeriamundoflor.com/product-category/amor/"]';
   private readonly cumpleanosLinkDesktop = '#primary-menu a[href="https://www.floristeriamundoflor.com/product-category/cumpleanos/"]';
-  // Fallback genérico con .first()
+
   private readonly amorLinkGeneric = 'a[href="https://www.floristeriamundoflor.com/product-category/amor/"]';
   private readonly cumpleanosLinkGeneric = 'a[href="https://www.floristeriamundoflor.com/product-category/cumpleanos/"]';
   private readonly cartIcon = '.mini-cart';
@@ -27,7 +27,7 @@ export class HomePage {
   async waitForPageLoad() {
     console.log('Esperando carga inicial de la página (10 segundos)...');
     
-    // Reducir espera inicial - 10 segundos es suficiente
+
     await this.page.waitForTimeout(10000);
     
     // Esperar que la página termine de cargar
@@ -52,7 +52,7 @@ export class HomePage {
       await expect(amorLinkDesktop).toBeEnabled({ timeout: 5000 });
       await amorLinkDesktop.click();
     } else {
-      // Estrategia 2: Usar selector genérico con .first()
+
       console.log('Usando enlace genérico (.first())');
       const amorLinkGeneric = this.page.locator(this.amorLinkGeneric).first();
       await expect(amorLinkGeneric).toBeVisible({ timeout: 10000 });
@@ -83,7 +83,7 @@ export class HomePage {
   async navegarACumpleanos(): Promise<void> {
     console.log('Navegando a la categoría Cumpleaños...');
     
-    // Estrategia 1: Intentar link específico del desktop menu
+
     const cumpleanosLinkDesktop = this.page.locator(this.cumpleanosLinkDesktop);
     
     if (await cumpleanosLinkDesktop.isVisible()) {
@@ -92,7 +92,7 @@ export class HomePage {
       await expect(cumpleanosLinkDesktop).toBeEnabled({ timeout: 5000 });
       await cumpleanosLinkDesktop.click();
     } else {
-      // Estrategia 2: Usar selector genérico con .first()
+
       console.log('Usando enlace genérico (.first())');
       const cumpleanosLinkGeneric = this.page.locator(this.cumpleanosLinkGeneric).first();
       await expect(cumpleanosLinkGeneric).toBeVisible({ timeout: 10000 });
@@ -102,7 +102,7 @@ export class HomePage {
     
     console.log('Click realizado, esperando carga de página...');
     
-    // Esperar navegación
+
     await this.page.waitForTimeout(3000);
     
     await Promise.race([
@@ -119,9 +119,9 @@ export class HomePage {
     console.log('✓ Navegación a Cumpleaños completada');
   }
 
-  // VALIDACIONES con .first() para evitar errores de strict mode
+  
   async validarExistenciaYVisibilidadAmor(): Promise<void> {
-    // Usar .first() para evitar strict mode violation
+    
     const amorElement = this.page.locator(this.amorLinkGeneric).first();
     
     await expect(amorElement).toBeVisible({ timeout: 15000 });
@@ -130,7 +130,7 @@ export class HomePage {
   }
 
   async validarExistenciaYVisibilidadCumpleanos(): Promise<void> {
-    // Usar .first() para evitar strict mode violation
+    
     const cumpleanosElement = this.page.locator(this.cumpleanosLinkGeneric).first();
     
     await expect(cumpleanosElement).toBeVisible({ timeout: 15000 });
@@ -139,13 +139,13 @@ export class HomePage {
   }
 
   async validarMenuCompleto(): Promise<void> {
-    // Basado en el HTML real que compartiste
+
     const menuItems = [
       'Arreglo Florales',
       'Amor', 
       'Cumpleaños',
       'Condolencias',
-      'Desayunos Sorpresa', // Actualizado según HTML real
+      'Desayunos Sorpresa',
       'Ramilletes y Cajas',
       'Contacto'
     ];
@@ -170,7 +170,7 @@ export class HomePage {
   async tomarScreenshotHomePage(): Promise<Buffer> {
     return await this.page.screenshot({ 
       fullPage: true,
-      animations: 'disabled' // Para screenshots más consistentes
+      animations: 'disabled' 
     });
   }
 
@@ -243,7 +243,7 @@ export class HomePage {
   // MÉTODO PARA ESPERAR ELEMENTOS CRÍTICOS
   async waitForCriticalElements(): Promise<void> {
     await expect(this.page.locator(this.menuNavigation)).toBeVisible({ timeout: 15000 });
-    // Usar .first() para evitar strict mode violation
+
     await expect(this.page.locator(this.amorLinkGeneric).first()).toBeVisible({ timeout: 10000 });
     await expect(this.page.locator(this.cumpleanosLinkGeneric).first()).toBeVisible({ timeout: 10000 });
   }

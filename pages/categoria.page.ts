@@ -28,13 +28,12 @@ export class CategoriaPage {
   async waitForCategoryLoad(): Promise<void> {
     console.log('Esperando carga de página de categoría...');
     
-    // Espera más eficiente - solo lo necesario
     await this.page.waitForLoadState('domcontentloaded');
     
     // Espera a que aparezca el grid de productos o mensaje de vacío
     await Promise.race([
       this.page.waitForSelector(this.productsGrid, { timeout: 15000 }),
-      this.page.waitForSelector('.woocommerce-info', { timeout: 15000 }) // Para categorías vacías
+      this.page.waitForSelector('.woocommerce-info', { timeout: 15000 }) 
     ]);
     
     // Espera breve para elementos AJAX
@@ -331,7 +330,7 @@ export class CategoriaPage {
   async tomarScreenshotCategoria(): Promise<Buffer> {
     return await this.page.screenshot({ 
       fullPage: true,
-      animations: 'disabled' // Para screenshots más consistentes
+      animations: 'disabled'
     });
   }
 
@@ -383,6 +382,6 @@ export class CategoriaPage {
     const hasProducts = await this.page.locator(this.productsGrid).first().isVisible();
     console.log('Grid de productos visible:', hasProducts);
     
-    console.log('===========================');
+
   }
 }

@@ -18,9 +18,9 @@ export class CarritoPage {
   private readonly updateCartButton = '[name="update_cart"]';
   private readonly cartIcon = '.mini-cart';
   
-  // ✅ FIX: Selector más específico para evitar ambigüedad
+  // FIX: Selector más específico para evitar ambigüedad
   private readonly cartCounter = '.mini-cart-items:not(.cart-mobile)';
-  // ✅ ALTERNATIVA: Si necesitas ambos, usa .first()
+  // ALTERNATIVA: Si necesitas ambos, usa .first()
   private readonly cartCounterGeneral = '.mini-cart-items, .cart-contents-count';
   
   private readonly checkoutButton = '.checkout-button';
@@ -30,13 +30,13 @@ export class CarritoPage {
     this.page = page;
   }
 
-// ✅ FIX: Navegación mejorada con timeouts más largos
+// FIX: Navegación mejorada con timeouts más largos
 async irAlCarrito(): Promise<void> {
     console.log('Navegando al carrito...');
     
     // Estrategia 1: Intentar click en icono del carrito
     const cartIcon = this.page.locator(this.cartIcon).first();
-    if (await cartIcon.isVisible({ timeout: 8000 })) { // ✅ Aumentado timeout
+    if (await cartIcon.isVisible({ timeout: 8000 })) { 
       try {
         await cartIcon.click();
         await this.waitForCartLoad();
@@ -53,8 +53,8 @@ async irAlCarrito(): Promise<void> {
     for (const route of possibleRoutes) {
       try {
         await this.page.goto(route, { 
-          timeout: 30000, // ✅ Aumentado timeout
-          waitUntil: 'domcontentloaded' // ✅ Espera específica
+          timeout: 30000, // Aumentado timeout
+          waitUntil: 'domcontentloaded' // Espera específica
         });
         await this.waitForCartLoad();
         console.log(`✓ Navegación directa exitosa usando: ${route}`);
@@ -68,7 +68,7 @@ async irAlCarrito(): Promise<void> {
     throw new Error('No se pudo navegar al carrito usando ninguna estrategia');
   }
 
-  // ✅ FIX: Espera mejorada para carga del carrito
+  // FIX: Espera mejorada para carga del carrito
   async waitForCartLoad(): Promise<void> {
     await this.page.waitForLoadState('domcontentloaded', { timeout: 30000 });
     
@@ -78,7 +78,7 @@ async irAlCarrito(): Promise<void> {
     
     await expect(cartTable.or(emptyMessage)).toBeVisible({ timeout: 15000 });
     
-    // ✅ Espera adicional más inteligente - solo si es necesario
+    // Espera adicional más inteligente - solo si es necesario
     await this.page.waitForFunction(() => {
       return document.readyState === 'complete';
     }, { timeout: 10000 });
@@ -100,7 +100,7 @@ async irAlCarrito(): Promise<void> {
       has: this.page.locator(this.productName).filter({ hasText: new RegExp(expectedName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
     });
     
-    await expect(productRow).toBeVisible({ timeout: 10000 }); // ✅ Timeout específico
+    await expect(productRow).toBeVisible({ timeout: 10000 }); 
     
     // Validar el precio
     const priceElement = productRow.locator(this.productPrice);
@@ -146,7 +146,7 @@ async irAlCarrito(): Promise<void> {
     return price.replace(/[^\d]/g, '');
   }
 
-  // ✅ FIX PRINCIPAL: removeProduct mejorado sin timeout fijo
+  //  FIX PRINCIPAL: removeProduct mejorado sin timeout fijo
   async removeProduct(productName: string): Promise<void> {
     // Buscar el producto por nombre (búsqueda más flexible)
     const productRow = this.page.locator(this.cartItems).filter({
@@ -159,16 +159,15 @@ async irAlCarrito(): Promise<void> {
     const removeBtn = productRow.locator(this.removeButton);
     await expect(removeBtn).toBeVisible({ timeout: 5000 });
     
-    // ✅ Esperar específicamente que el producto desaparezca
+    // Esperar específicamente que el producto desaparezca
     await removeBtn.click();
     
-    // ✅ En lugar de waitForTimeout, esperar condiciones específicas
+    // En lugar de waitForTimeout, esperar condiciones específicas
     await this.page.waitForLoadState('domcontentloaded', { timeout: 15000 });
     
-    // ✅ Esperar que el producto específico ya no esté visible
+    // Esperar que el producto específico ya no esté visible
     await expect(productRow).toBeHidden({ timeout: 10000 });
     
-    // ✅ O esperar que el contador del carrito se actualice
     const currentItemCount = await this.getCartItemCount();
     console.log(`Producto eliminado. Items restantes: ${currentItemCount}`);
   }
@@ -185,7 +184,7 @@ async irAlCarrito(): Promise<void> {
       const itemCount = await this.page.locator(this.cartItems).count();
       return itemCount === 0;
     } catch (error) {
-      // Si hay error, asumir que no está vacío y dejar que otros métodos manejen el error
+
       return false;
     }
   }
@@ -285,16 +284,16 @@ async irAlCarrito(): Promise<void> {
     await checkoutButton.click();
   }
 
-  // ✅ Método helper para obtener el contador del carrito de forma segura
+  // Método helper para obtener el contador del carrito de forma segura
   async getCartCounterText(): Promise<string> {
     try {
-      // Intentar con el selector específico primero
+
       const specificCounter = this.page.locator(this.cartCounter);
       if (await specificCounter.isVisible({ timeout: 3000 })) {
         return await specificCounter.textContent() || '0';
       }
       
-      // Si no funciona, usar el genérico con .first()
+
       const generalCounter = this.page.locator(this.cartCounterGeneral).first();
       if (await generalCounter.isVisible({ timeout: 3000 })) {
         return await generalCounter.textContent() || '0';
@@ -317,7 +316,7 @@ async irAlCarrito(): Promise<void> {
   }
 
   async attachScreenshots(testInfo: any): Promise<void> {
-    // Adjuntar screenshots al reporte de Playwright
+  
     const screenshot = await this.page.screenshot({ fullPage: true });
     await testInfo.attach('carrito-estado-actual', { 
       body: screenshot, 

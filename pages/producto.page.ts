@@ -5,7 +5,7 @@ export class ProductoPage {
 
   // Selectores más específicos para PÁGINA INDIVIDUAL de producto
   private readonly productTitle = 'h1.product_title.entry-title';
-  private readonly productPrice = '.summary .price .woocommerce-Price-amount';  // MÁS ESPECÍFICO - solo el precio del producto actual
+  private readonly productPrice = '.summary .price .woocommerce-Price-amount';
   private readonly addToCartButton = 'button.single_add_to_cart_button';
   private readonly productDescription = '.woocommerce-product-details__short-description';
   private readonly productImage = '.woocommerce-product-gallery img';
@@ -22,7 +22,7 @@ export class ProductoPage {
   async waitForProductLoad(): Promise<void> {
     console.log('Esperando carga de página de producto...');
     
-    // Esperar carga básica SIN networkidle que causa timeout
+
     await this.page.waitForLoadState('domcontentloaded');
     
     // Intentar networkidle con timeout corto, pero no fallar si no se cumple
@@ -32,7 +32,7 @@ export class ProductoPage {
       console.log('NetworkIdle timeout - continuando sin esperar networkidle');
     }
 
-    // Validar que estamos en una página INDIVIDUAL de producto (no listado)
+
     await this.waitForSingleProductPage();
     
     console.log('Página de producto cargada correctamente');
@@ -42,8 +42,8 @@ export class ProductoPage {
     // Esperar que el título del producto esté visible
     await expect(this.page.locator(this.productTitle)).toBeVisible({ timeout: 15000 });
     
-    // Esperar el precio ESPECÍFICO del producto individual (no los de productos relacionados)
-    // Usar .first() para tomar solo el primer precio encontrado
+    // Esperar el precio ESPECÍFICO del producto individual 
+    
     await expect(this.page.locator(this.productPrice).first()).toBeVisible({ timeout: 15000 });
     
     // Esperar el botón de agregar al carrito
@@ -62,7 +62,7 @@ export class ProductoPage {
     
     const nombre = await this.page.locator(this.productTitle).textContent() || 'Producto sin nombre';
     
-    // Usar .first() para obtener solo el primer precio (del producto actual)
+    
     const precio = await this.page.locator(this.productPrice).first().textContent() || '$0';
     
     let descripcion = '';
@@ -110,11 +110,11 @@ export class ProductoPage {
   async validateProductAdded(): Promise<void> {
     console.log('Validando que el producto fue agregado...');
     
-    // Esperar un poco para que procese la acción
+
     await this.page.waitForTimeout(3000);
 
     
-    // Buscar notificación de éxito (opcional - no falla si no aparece)
+
     const notification = this.page.locator(this.cartNotification);
     
     if (await notification.isVisible()) {

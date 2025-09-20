@@ -66,7 +66,7 @@ test.describe('Escenario 2 - Categoría Cumpleaños E2E', () => {
     const detallesProducto = await productoPage.getProductDetails();
     expect(detallesProducto.nombre).toContain(producto.nombre);
     
-    // Screenshot antes de agregar al carrito (requerido por la prueba)
+    // Screenshot antes de agregar al carrito 
     await test.info().attach('antes-agregar-producto-cumpleanos', {
       body: await page.screenshot({ fullPage: true }),
       contentType: 'image/png'
@@ -77,7 +77,7 @@ test.describe('Escenario 2 - Categoría Cumpleaños E2E', () => {
     await productoPage.validateProductAdded();
     
 //  5. Verificar que el contador del carrito se actualiza
-    // Fix: Usar .first() para evitar strict mode violation
+    
     const cartCounter = page.locator('.mini-cart-items, .cart-contents-count').first();
     
     
@@ -89,7 +89,7 @@ test.describe('Escenario 2 - Categoría Cumpleaños E2E', () => {
         console.log(`✓ Contador del carrito actualizado: ${counterValue}`);
       } else {
         console.log('Contador no visible, verificando notificación de producto agregado...');
-        // Alternativa: verificar notificación de "añadido al carrito"
+
         const notification = page.locator('.woocommerce-message').first();
         if (await notification.isVisible({ timeout: 3000 })) {
           const notificationText = await notification.textContent();
@@ -99,7 +99,7 @@ test.describe('Escenario 2 - Categoría Cumpleaños E2E', () => {
       }
     } catch (error) {
       console.log('Error con contador del carrito, continuando test...', error);
-      // No hacer fallar el test por este problema menor
+
     }
     
     // Screenshot después de agregar al carrito
@@ -132,7 +132,7 @@ test.describe('Escenario 2 - Categoría Cumpleaños E2E', () => {
     const itemCountAntes = await carritoPage.getCartItemCount();
     expect(itemCountAntes).toBe(1);
     
-    // Screenshot del carrito ANTES de eliminar (requerido por la prueba)
+    // Screenshot del carrito ANTES de eliminar 
     await test.info().attach('carrito-antes-eliminar-cumpleanos', {
       body: await page.screenshot({ fullPage: true }),
       contentType: 'image/png'
@@ -141,7 +141,7 @@ test.describe('Escenario 2 - Categoría Cumpleaños E2E', () => {
     // 3. Eliminar el producto del carrito
     await carritoPage.removeProduct(producto.nombre);
     
-    // Screenshot del carrito DESPUÉS de eliminar (requerido por la prueba)
+    // Screenshot del carrito DESPUÉS de eliminar 
     await test.info().attach('carrito-despues-eliminar-cumpleanos', {
       body: await page.screenshot({ fullPage: true }),
       contentType: 'image/png'

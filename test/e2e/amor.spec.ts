@@ -26,7 +26,7 @@ test.describe('Escenario 1 - Categoría Amor E2E', () => {
     await homePage.navegarAArmor();
     
     // 2. Validar que estamos en la página de Amor
-    await categoriaPage.validarTituloCategoria(testData.categorias[0]); // 'Amor'
+    await categoriaPage.validarTituloCategoria(testData.categorias[0]); 
     await categoriaPage.validarProductosDisponibles();
     
     // Screenshot de la categoría cargada
