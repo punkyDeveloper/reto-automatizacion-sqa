@@ -125,14 +125,44 @@ npx playwright codegen https://ejemplo.com
 ## 📁 Estructura del Proyecto
 
 ```
-├── 📁 tests/                 # Archivos de prueba
-│   ├── 📄 example.spec.js    # Pruebas de ejemplo
-│   └── 📄 ...               # Más pruebas
-├── 📁 test-results/          # Resultados de pruebas
-├── 📁 playwright-report/     # Reportes HTML
-├── 📄 playwright.config.js   # Configuración de Playwright
-├── 📄 package.json          # Dependencias y scripts
-└── 📄 README.md             # Este archivo
+proyecto-playwright/
+├── 📁 .github/                  # 🔧 Configuración de GitHub
+├── 📁 pages/                    # 📄 Page Object Model
+│   ├── 📄 caro.page.ts          # Página del carrusel
+│   ├── 📄 categoria.page.ts     # Página de categorías
+│   ├── 📄 home.page.ts          # Página principal
+│   └── 📄 producto.page.ts      # Página de productos
+├── 📁 playwright-report/        # 📊 Reportes HTML generados
+├── 📁 test/                     # 🧪 Suite de Pruebas
+│   ├── 📁 e2e/                  # Pruebas end-to-end
+│   │   ├── 📄 amor.spec.ts      # Pruebas de funcionalidad amor
+│   │   └── 📄 cumple.spec.ts    # Pruebas de cumpleaños
+│   ├── 📁 fixtures/             # 📊 Datos de prueba
+│   │   ├── 📁 imgtest/          # Imágenes para testing
+│   │   │   └── 🖼️ exit.png     # Imagen de salida
+│   │   └── 📄 test-data.ts      # Datos de prueba
+│   ├── 📁 test-results/         # 📈 Resultados de ejecución
+│   └── 📁 test-examples/        # 📚 Ejemplos de pruebas
+│       └── 📄 demo-todo-app.spec.ts # Ejemplo demo
+├── 📄 .gitignore                # 🚫 Archivos ignorados
+├── 🖼️ image.png                # 📸 Imagen del proyecto
+├── 📄 package-lock.json         # 🔒 Lockfile de dependencias
+├── 📄 package.json              # 📦 Dependencias y scripts
+├── 📄 playwright.config.ts      # ⚙️ Configuración principal
+└── 📄 README.md                 # 📚 Documentación
+```
+## 🧪 Organización de Pruebas
+
+```
+test/
+├── e2e/                ← Pruebas de flujo completo
+│   ├── amor.spec.ts    ← Funcionalidad de amor/favoritos
+│   └── cumple.spec.ts  ← Funcionalidad de cumpleaños
+├── fixtures/           ← Datos y recursos de prueba
+│   ├── imgtest/        ← Imágenes para validaciones
+│   └── test-data.ts    ← Datos estructurados
+├── test-results/       ← Resultados de ejecución
+└── test-examples/      ← Ejemplos y plantillas
 ```
 
 ## 🔧 Configuración
